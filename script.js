@@ -30,19 +30,33 @@ console.log(conjuntoCEPs)
 Promise.all(conjuntoCEPs).then(respostas => console.log(respostas));
  */
 
-async function buscaEndereco() {//A declaração async function define uma função assíncrona
+async function buscaEndereco(cep) {//A declaração async function define uma função assíncrona
+    var mensagemErro = document.getElementById("erro");
+    mensagemErro.innerHTML = "";
     try {
-        var consultaCEP = await fetch("http://viacep.com.br/ws/01001000/json/");//O operador await é utilizado para esperar por uma Promise. 
+        var consultaCEP = await fetch(`http://viacep.com.br/ws/${cep}/json/`);//O operador await é utilizado para esperar por uma Promise. 
         var consultaCEPConvetida = await consultaCEP.json();
+
         if (consultaCEPConvetida.erro) {
             throw Error("CEP não existe!")
         }
-        console.log(consultaCEPConvetida);
+
+        var logradouro = document.getElementById("endereco");
+        var cidade = document.getElementById("cidade");
+        var estado = document.getElementById("estado");
+
+        logradouro.value = consultaCEPConvetida.logradouro
+        bairro.value = consultaCEPConvetida.bairro
+        cidade.value = consultaCEPConvetida.localidade
+        estado.value = consultaCEPConvetida.uf
+        
+        //console.log(consultaCEPConvetida);
     } catch (erro) {
+        mensagemErro.innerHTML = `<p>CEP inválido. Tente novamente!`
         console.log(erro);
     }
 }
 
-buscaEndereco();
-
-
+//buscaEndereco();
+var cep = document.getElementById("cep");
+cep.addEventListener("focusout", () => buscaEndereco(cep.value));
